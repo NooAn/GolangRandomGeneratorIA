@@ -2,27 +2,29 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"sync"
+	"time"
 )
 
-const N = 2
-const D = 2
+const N = 4
+const D = 1
 
 var f *os.File
 var wg sync.WaitGroup
 
-func size() uint32 {
+func size() int {
 	return 1 << N
 }
-func modK(x uint32) uint32 {
+func modK(x int) int {
 	return x & (K() - 1)
 }
-func K() uint32 {
+func K() int {
 	return 1 << (2*N + D)
 }
 
-func mod(x uint32) uint32 { // operation (mod 2^k), where 2^k = size()
+func mod(x int) int { // operation (mod 2^k), where 2^k = size()
 	return x & (size() - 1)
 }
 func check(e error) {
@@ -30,7 +32,7 @@ func check(e error) {
 		panic(e)
 	}
 }
-func checkZeroAllNumber(mas []uint32, res []uint32) {
+func checkZeroAllNumber(mas []int, res []int) {
 	count := 0
 	for i := range mas {
 		if mas[i] == 0 {
@@ -45,13 +47,13 @@ func checkZeroAllNumber(mas []uint32, res []uint32) {
 	}
 }
 
-func IA(mas []uint32, q uint32) {
-	r := make([]uint32, size())
-	var x uint32
-	masRes := make([]uint32, len(mas))
+func IA(mas []int, q int) {
+	r := make([]int, size())
+	var x int
+	masRes := make([]int, len(mas))
 	copy(masRes, mas)
 	b := q
-	var i uint32
+	var i int
 	for i = 0; i < size(); i += 1 {
 		x = mas[i]
 		masRes[i] = modK(masRes[mod(x)] + b)
@@ -61,7 +63,7 @@ func IA(mas []uint32, q uint32) {
 
 	checkZeroAllNumber(r, mas)
 }
-func isEndMas(mas []uint32, end uint32) bool {
+func isEndMas(mas []int, end int) bool {
 	count := 0
 	for i := range mas {
 		if mas[i] == end-1 {
@@ -73,45 +75,38 @@ func isEndMas(mas []uint32, end uint32) bool {
 	}
 	return false
 }
-func gen(mas []uint32, pos uint32) {
+func genAll(mas2 []int, pos int) {
 	if pos == size() {
-		//		if isEndMas(mas, K()/3) {
-		//			defer wg.Done()
-		//		}
-		IA(mas, 0)
-		//fmt.Println(mas)
-		return
-	}
-	for i := 0; i < int(K()/3); i += 1 {
-		mas[pos] = uint32(i)
-		gen(mas, pos+1)
-	}
-}
-func gen2(mas2 []uint32, pos uint32) {
-	if pos == size() {
-		if isEndMas(mas2, K()) {
-			defer wg.Done()
-		}
+
 		IA(mas2, 0)
 		return
 	}
 	for i := 0; i < int(K()); i += 1 {
-		mas2[pos] = uint32(i)
-		gen2(mas2, pos+1)
+		mas2[pos] = int(i)
+		genAll(mas2, pos+1)
+	}
+}
+func genRandomNumber(mas []int) {
+	rand.Seed(int64(time.Now().Nanosecond()))
+	var i int64
+	fmt.Println("Kol:", int64(K()*K()*K()*K()*size()))
+	for i = 0; i < int64(K()*K()*K()*K()*size()); i += 1 {
+		for j := 0; j < size(); j += 1 {
+			mas[j] = rand.Intn(int(K()))
+		}
+		//		fmt.Println(mas)
+		IA(mas, 0)
 	}
 }
 func main() {
 	fmt.Println("start")
-	//r := make([]uint32, size())
-	r2 := make([]uint32, size())
+	//r := make([]int, size())
+	r2 := make([]int, size())
 	var nameFile string
 	nameFile = fmt.Sprintf("key for N=%d D=%d.txt", N, D)
 	f, _ = os.Create(nameFile)
 	defer f.Close()
-	wg.Add(1)
-	fmt.Println(int(K()) / 3)
-	go gen2(r2, 0)
-
-	wg.Wait()
+	//genAll(r2, 0)
+	genRandomNumber(r2)
 
 }
