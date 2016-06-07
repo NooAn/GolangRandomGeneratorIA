@@ -8,8 +8,8 @@ import (
 	"time"
 )
 
-const N = 4
-const D = 1
+const N = 2
+const D = 3
 
 var f *os.File
 var wg sync.WaitGroup
@@ -32,6 +32,14 @@ func check(e error) {
 		panic(e)
 	}
 }
+func checkStateOne(mas []int, res []int) bool{
+	for i:= range mas {
+		if (mas[i] != res[i]) {
+			return false 
+		}
+	}
+	return true
+}
 func checkZeroAllNumber(mas []int, res []int) {
 	count := 0
 	for i := range mas {
@@ -46,7 +54,9 @@ func checkZeroAllNumber(mas []int, res []int) {
 
 	}
 }
-
+/**
+ Where r[i] - выходная последовательность
+*/
 func IA(mas []int, q int) {
 	r := make([]int, size())
 	var x int
@@ -61,7 +71,18 @@ func IA(mas []int, q int) {
 		b = r[i]
 	}
 
-	checkZeroAllNumber(r, mas)
+	// Проверка на неизменения состояния
+	masRes2 := make([]int, len(mas))
+	copy(masRes2, mas)
+
+	if checkStateOne(r, masRes2) {
+		str := fmt.Sprint(r) + "\n"
+		f.WriteString(str)
+		fmt.Println(str, b)
+		
+	}
+	// проверка на сплошные нули
+//	checkZeroAllNumber(r, mas)
 }
 func isEndMas(mas []int, end int) bool {
 	count := 0
@@ -77,7 +98,6 @@ func isEndMas(mas []int, end int) bool {
 }
 func genAll(mas2 []int, pos int) {
 	if pos == size() {
-
 		IA(mas2, 0)
 		return
 	}
@@ -100,13 +120,11 @@ func genRandomNumber(mas []int) {
 }
 func main() {
 	fmt.Println("start")
-	//r := make([]int, size())
-	r2 := make([]int, size())
+	r := make([]int, size())
 	var nameFile string
-	nameFile = fmt.Sprintf("key for N=%d D=%d.txt", N, D)
+	nameFile = fmt.Sprintf("state key for N=%d D=%d.txt", N, D)
 	f, _ = os.Create(nameFile)
 	defer f.Close()
-	//genAll(r2, 0)
-	genRandomNumber(r2)
-
+	genAll(r, 0)
+	//genRandomNumber(r2)
 }
