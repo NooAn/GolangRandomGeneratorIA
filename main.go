@@ -9,7 +9,7 @@ import (
 )
 
 const N = 2
-const D = 3
+const D = 2
 
 var f *os.File
 var wg sync.WaitGroup
@@ -27,7 +27,7 @@ func K() int {
 func mod(x int) int { // operation (mod 2^k), where 2^k = size()
 	return x & (size() - 1)
 }
-func check(e error) {
+func check2(e error) {
 	if e != nil {
 		panic(e)
 	}
@@ -40,18 +40,26 @@ func checkStateOne(mas []int, res []int) bool{
 	}
 	return true
 }
+func check(mas []int ) bool{
+	for i:=range mas {
+		if mas[i] != mas[mod(mas[i])] {
+			return false
+		}
+	}
+	return true
+}
 func checkZeroAllNumber(mas []int, res []int) {
+	
 	count := 0
 	for i := range mas {
 		if mas[i] == 0 {
 			count += 1
 		}
 	}
-	if count == len(mas) {
-		str := fmt.Sprint(res) + "\n"
-		b, _ := f.WriteString(str)
-		fmt.Println(res, b)
-
+	if count == len(mas)  {
+			str := fmt.Sprint(res) + "\n"
+			f.WriteString(str)
+			//	fmt.Println(res, b)
 	}
 }
 /**
@@ -75,14 +83,18 @@ func IA(mas []int, q int) {
 	masRes2 := make([]int, len(mas))
 	copy(masRes2, mas)
 
-	if checkStateOne(r, masRes2) {
-		str := fmt.Sprint(r) + "\n"
-		f.WriteString(str)
-		fmt.Println(str, b)
+	// if checkStateOne(r, masRes2) {
+	// 	str := fmt.Sprint(r) + "\n"
+	// 	f.WriteString(str)
+	// 	fmt.Println(str, b)
 		
+	// }
+	// проверка на сплошные нули и равенство уравнений
+	if check(masRes2) {
+		str := fmt.Sprint(res) + "\n"
+		f.WriteString(str)
+		//checkZeroAllNumber(r, mas)
 	}
-	// проверка на сплошные нули
-//	checkZeroAllNumber(r, mas)
 }
 func isEndMas(mas []int, end int) bool {
 	count := 0
@@ -122,9 +134,10 @@ func main() {
 	fmt.Println("start")
 	r := make([]int, size())
 	var nameFile string
-	nameFile = fmt.Sprintf("state key for N=%d D=%d.txt", N, D)
+	nameFile = fmt.Sprintf("key3 for N=%d D=%d.txt", N, D)
 	f, _ = os.Create(nameFile)
 	defer f.Close()
 	genAll(r, 0)
+
 	//genRandomNumber(r2)
 }
