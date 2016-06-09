@@ -9,7 +9,7 @@ import (
 )
 
 const N = 2
-const D = 2
+const D = 3
 
 var f *os.File
 var wg sync.WaitGroup
@@ -32,67 +32,79 @@ func check2(e error) {
 		panic(e)
 	}
 }
-func checkStateOne(mas []int, res []int) bool{
-	for i:= range mas {
-		if (mas[i] != res[i]) {
-			return false 
+func checkStateOne(mas []int, res []int) bool {
+	for i := range mas {
+		if mas[i] != res[i] {
+			return false
 		}
 	}
 	return true
 }
-func check(mas []int ) bool{
-	for i:=range mas {
+func check(mas []int) bool {
+	for i := range mas {
 		if mas[i] != mas[mod(mas[i])] {
 			return false
 		}
 	}
 	return true
 }
+func checkTwo(mas []int, k []int) bool {
+	for i := range k {
+		if k[i] != mas[i] {
+			return false
+		}
+	}
+	return true
+}
 func checkZeroAllNumber(mas []int, res []int) {
-	
+
 	count := 0
 	for i := range mas {
 		if mas[i] == 0 {
 			count += 1
 		}
 	}
-	if count == len(mas)  {
-			str := fmt.Sprint(res) + "\n"
-			f.WriteString(str)
-			//	fmt.Println(res, b)
+	if count == len(mas) {
+		str := fmt.Sprint(res) + "\n"
+		f.WriteString(str)
+		//	fmt.Println(res, b)
 	}
 }
+
 /**
- Where r[i] - выходная последовательность
+Where r[i] - выходная последовательность
 */
 func IA(mas []int, q int) {
-	r := make([]int, size())
+	r := make([]int, 2*size())
 	var x int
 	masRes := make([]int, len(mas))
 	copy(masRes, mas)
 	b := q
 	var i int
-	for i = 0; i < size(); i += 1 {
-		x = mas[i]
-		masRes[i] = modK(masRes[mod(x)] + b)
-		r[i] = modK(masRes[mod(masRes[i]>>N)] + x)
+	for i = 0; i < 8; i += 1 {
+		x = mas[mod(i)]
+		masRes[mod(i)] = modK(masRes[mod(x)] + b)
+		r[i] = modK(masRes[mod(masRes[mod(i)]>>N)] + x)
 		b = r[i]
 	}
 
 	// Проверка на неизменения состояния
 	masRes2 := make([]int, len(mas))
 	copy(masRes2, mas)
+	masRes3 := make([]int, len(mas))
+	copy(masRes3, masRes)
 
 	// if checkStateOne(r, masRes2) {
 	// 	str := fmt.Sprint(r) + "\n"
 	// 	f.WriteString(str)
 	// 	fmt.Println(str, b)
-		
+
 	// }
 	// проверка на сплошные нули и равенство уравнений
-	if check(masRes2) {
-		str := fmt.Sprint(res) + "\n"
+	if checkTwo(masRes2, masRes3) {
+		str := "s0: " + fmt.Sprint(mas) + " 	 S: " + fmt.Sprint(masRes) + " 	 q:" + fmt.Sprint(r)
 		f.WriteString(str)
+		fmt.Println(str)
 		//checkZeroAllNumber(r, mas)
 	}
 }
